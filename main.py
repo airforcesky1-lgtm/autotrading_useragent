@@ -114,7 +114,7 @@ async def register_with_central(agent_url: str):
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             resp = await client.post(
-                f"{settings.central_url}/api/agent/register",
+                f"{settings.central_url_normalized}/api/agent/register",
                 json={
                     "agent_url": agent_url,
                     "agent_token": settings.agent_token,
@@ -144,7 +144,7 @@ async def _post_to_central(path: str, payload: dict):
     try:
         async with httpx.AsyncClient(timeout=10.0) as http:
             resp = await http.post(
-                f"{settings.central_url}{path}",
+                f"{settings.central_url_normalized}{path}",
                 json=payload,
                 headers={"Authorization": f"Bearer {settings.agent_token}"},
             )
@@ -368,7 +368,10 @@ async def lifespan(app: FastAPI):
         logger.info(f"Agent URL: {agent_url}")
         asyncio.create_task(register_with_central(agent_url))
     else:
-        logger.warning("RAILWAY_PUBLIC_DOMAIN not set - skipping registration (local mode)")
+        logger.warning(
+            "RAILWAY_PUBLIC_DOMAIN not set - 앱과 연동이 되지 않습니다. "
+            "Railway 서비스에서 Settings → Networking → Generate Domain으로 퍼블릭 도메인을 생성하세요."
+        )
 
     asyncio.create_task(detect_manual_positions())
     logger.info(f"Agent started: exchange={settings.exchange}, user={settings.user_id[:8]}...")

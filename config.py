@@ -21,7 +21,12 @@ class AgentSettings(BaseSettings):
     agent_token: str              # 앱에서 발급받은 토큰
 
     # 중앙 서버 연결
-    central_url: str              # e.g. https://central-server.railway.app
+    central_url: str              # e.g. https://central-server.railway.app (끝에 / 없이)
+
+    @property
+    def central_url_normalized(self) -> str:
+        """trailing slash 제거한 central_url"""
+        return self.central_url.rstrip("/")
 
     # 서버 포트 (Railway 자동 제공)
     port: int = 8000
